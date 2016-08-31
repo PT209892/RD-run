@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">RD run</string>
+    <string name="signup">สมัครสมาชิก</string>
+    <string name="singin">ลงชื่อใช้งาน</string>
+</resources>
