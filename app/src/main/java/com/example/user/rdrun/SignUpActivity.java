@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -30,7 +31,7 @@ public class SignUpActivity extends AppCompatActivity {
     private RadioButton avata1RadioButton, avata2RadioButton, avata3RadioButton, avata4RadioButton, avata5RadioButton;
 
     private String nameString,surnameString,userString,passwordString,avataString;
-    private static final String urlPHP ="http://swiftcodingthai.com/rd/add_user_somjai.php";//connect database
+    private static final String urlPHP ="http://swiftcodingthai.com/rd/add_user_Pattama.php";//connect database
 
 
 
@@ -153,11 +154,14 @@ public class SignUpActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Response response) throws IOException {
+                Log.d("31AugV1", "Result" + response.body().string());
                 finish();
             }
         });
 
     }//upload
+
+
 
     private boolean checkChoose() {
 
