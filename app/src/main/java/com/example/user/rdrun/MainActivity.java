@@ -12,6 +12,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }   //Main Method นี่คือเมธอด
+
+    public void clickSignInMain(View view) {
+
+    }
+
+
     //Get Event from Click Butoon
     //Shit+Ctrl+Enter คือ complementKey เพื่อใส่รูปแบบให้ถูกต้อง
     public void clickSignUpMain(View view) {
