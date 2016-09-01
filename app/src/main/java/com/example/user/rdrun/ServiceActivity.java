@@ -36,7 +36,6 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private LocationManager locationManager;//เปิดในการค้นหาพิกัดที่อยู่บนโลก location แผนที่ คือ ละติจูด ลองติดจูด
     private Criteria criteria;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
