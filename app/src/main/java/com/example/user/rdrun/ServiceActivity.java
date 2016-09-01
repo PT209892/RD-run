@@ -1,5 +1,8 @@
 package com.example.user.rdrun;
 
+import android.content.Context;
+import android.location.Criteria;
+import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -25,7 +28,9 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private ImageView imageView;
     private TextView nameTextView, surnameTextView;
     private int[] avataInts;
-    private double userLatAdouble = 13.803358,userLngADouble = 100.583832;
+    private double userLatAdouble = 13.803358,userLngADouble = 100.583832;//Connection
+    private LocationManager locationManager;//เปิดในการค้นหาพิกัดที่อยู่บนโลก location แผนที่ คือ ละติจูด ลองติดจูด
+    private Criteria criteria;
 
 
     @Override
@@ -36,11 +41,22 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         imageView = (ImageView) findViewById(R.id.imageView7);
         nameTextView = (TextView) findViewById(R.id.textView8);
         surnameTextView = (TextView) findViewById(R.id.textView9);
+
+
         //Get value From Intent
         idString = getIntent().getStringExtra("id");
         avataString = getIntent().getStringExtra("Avata");
         nameString = getIntent().getStringExtra("Name");
         surnameString = getIntent().getStringExtra("Surname");
+        //Setup Location
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);//ตำแหน่งห่างจากน้ำทะเล
+
+
+
 
         //Show Text
         nameTextView.setText(nameString);
