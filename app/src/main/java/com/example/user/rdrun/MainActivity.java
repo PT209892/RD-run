@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         statusABoolean = false;
                         truePasswordString = jsonObject.getString("Password");
                         nameString = jsonObject.getString("Name");
-                        surnameString = jsonObject.getString("SurName");
+                        surnameString = jsonObject.getString("Surname");
                         idString = jsonObject.getString("id");
 
                     }// if
