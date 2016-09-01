@@ -2,9 +2,13 @@ package com.example.user.rdrun;
 
 import android.content.Context;
 import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -73,6 +77,73 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     }//Main Method
 
     @Override
+    //เช็คครั้งแรกจะได้ Network provider ก่อน แล้วจะได้ gps
+    protected void onResume() {
+        super.onResume();
+        locationManager.removeUpdates(locationListener);
+        Location networkLocation = myFindLocation(LocationManager.NETWORK_PROVIDER);
+        if(networkLocation != null){
+            userLatAdouble = networkLocation.getLatitude();
+            userLngADouble = networkLocation.getLongitude();
+        }
+        Location gpsLocation = myFindLocation(LocationManager.GPS_PROVIDER);
+        if (gpsLocation != null) {
+            userLatAdouble = gpsLocation.getLatitude();
+            userLngADouble = gpsLocation.getLongitude();
+        }
+
+
+
+    }// onResume
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        locationManager.removeUpdates(locationListener);
+
+    }
+
+    public  Location myFindLocation(String strProvider) {
+        Location location = null;
+        if (locationManager.isProviderEnabled(strProvider)) {
+            locationManager.requestLocationUpdates(strProvider, 1000, 10, locationListener);
+            location = locationManager.getLastKnownLocation(strProvider);
+
+        } else {
+            Log.d("1SepV1", "Cannot find Location");
+        }
+
+
+        return location;
+    }
+
+    public LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            userLatAdouble = location.getLatitude();
+            userLngADouble = location.getLongitude();
+
+
+        }//OnLocationChange
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
+
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
@@ -80,5 +151,25 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         LatLng latLng = new LatLng(userLatAdouble, userLngADouble);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,16));
 
+        //Loop
+        myLoop();
+
+
     }
+
+    private void myLoop() {
+        //To do สิ่งที่ต้องทำ
+        Log.d("1SepV2", "Lat==>" + userLatAdouble);
+        Log.d("1SepV2", "Lng==>" + userLngADouble);
+
+        //Post Delay
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                myLoop();
+            }
+        },1000);
+
+    }   //myLoop
 } //Main Class
