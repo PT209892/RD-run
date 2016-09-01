@@ -61,7 +61,7 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
 
         // Setup Center of Map
         LatLng latLng = new LatLng(userLatAdouble, userLngADouble);
-        mMap.animateCamera();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,16));
 
     }
 } //Main Class
