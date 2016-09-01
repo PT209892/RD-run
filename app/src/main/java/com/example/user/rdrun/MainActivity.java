@@ -44,16 +44,14 @@ public class MainActivity extends AppCompatActivity {
     private class SynUser extends AsyncTask<Void, Void, String> {
         //Explicit
         private Context context;
-        private String myUserString, myPasswordString,truePasswordString,nameString,surnameString,idString;
+        private String myUserString, myPasswordString,truePasswordString,nameString,surnameString,idString,avatarString;
         private static final String urlJSon = "http://swiftcodingthai.com/rd/get_user_master.php";
         private boolean statusABoolean = true;
 
         public SynUser(Context context, String myUserString, String myPasswordString) {
             this.context = context;
             this.myUserString = myUserString;
-            this.myPasswordString = myPasswordString;
-
-        }
+            this.myPasswordString = myPasswordString;        }
 
         @Override
         protected String doInBackground(Void... params) {
@@ -86,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         nameString = jsonObject.getString("Name");
                         surnameString = jsonObject.getString("Surname");
                         idString = jsonObject.getString("id");
+                        avatarString = jsonObject.getString("Avata");
 
                     }// if
 
@@ -98,6 +97,11 @@ public class MainActivity extends AppCompatActivity {
                 } else if (myPasswordString.equals(truePasswordString)) {
                     //Password True
                     Intent intent = new Intent(MainActivity.this,ServiceActivity.class);
+                    intent.putExtra("id", idString);
+                    intent.putExtra("Avata", avatarString);
+                    intent.putExtra("Name", nameString);
+                    intent.putExtra("Surname", surnameString);
+
                     startActivity(intent);
 
                     Toast.makeText(context, "Welcome " + nameString + " " + surnameString,
