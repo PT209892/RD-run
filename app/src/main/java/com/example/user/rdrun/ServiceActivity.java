@@ -19,6 +19,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 
 import static com.example.user.rdrun.R.id.textView7;
 
@@ -35,7 +44,7 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private double userLatAdouble = 13.803358,userLngADouble = 100.583832;//Connection
     private LocationManager locationManager;//เปิดในการค้นหาพิกัดที่อยู่บนโลก location แผนที่ คือ ละติจูด ลองติดจูด
     private Criteria criteria;
-
+    private static final String urlPHP="http://swiftcodingthai.com/rd/edit_location_pattama.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +171,8 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         Log.d("1SepV2", "Lat==>" + userLatAdouble);
         Log.d("1SepV2", "Lng==>" + userLngADouble);
 
+        editLatLngOnServer();
+
         //Post Delay
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -172,4 +183,29 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         },1000);
 
     }   //myLoop
+
+    private void editLatLngOnServer() {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final RequestBody requestBody = new FormEncodingBuilder()
+                .add("isAdd", "true")
+                .add("id", idString)
+                .add("Lat", Double.toString(userLatAdouble))
+                .add("Lng", Double.toString(userLngADouble))
+                .build();
+        Request .Builder builder = new Request.Builder();
+        Request request = builder.url(urlPHP).post(requestBody).build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.d("2SepV1", "e ==>" + e.toString());
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                Log.d("2SepV1", "Result ==>" + response.body().string());
+            }
+        });
+
+    }   //editLating
 } //Main Class
