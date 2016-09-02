@@ -17,7 +17,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -44,11 +47,11 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private ImageView imageView;
     private TextView nameTextView, surnameTextView;
     private int[] avataInts;
-    private double userLatAdouble = 13.803358,userLngADouble = 100.583832;//Connection
+    private double userLatAdouble = 13.807213,userLngADouble = 100.574669;//Connection
     private LocationManager locationManager;//เปิดในการค้นหาพิกัดที่อยู่บนโลก location แผนที่ คือ ละติจูด ลองติดจูด
     private Criteria criteria;
     private static final String urlPHP="http://swiftcodingthai.com/rd/edit_location_pattama.php";
-
+    private boolean statusABoolean=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +75,6 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);//ตำแหน่งห่างจากน้ำทะเล
 
-
-
-
         //Show Text
         nameTextView.setText(nameString);
         surnameTextView.setText(surnameString);
@@ -89,6 +89,23 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
     }//Main Method
 
+    public void clickNormal(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
+
+    public void clickSatellife(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+
+    public void clickTerrain(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+    }
+
+    public void clickHybrid(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
+
     private class SynAllUser extends AsyncTask<Void, Void, String> {
         //Explicit
         private Context context;
@@ -97,6 +114,8 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         private String[] nameStrings, surStrings;
         private int[] avataInts;
         private double[] latDoubles, lngDoubles;
+       // private boolean statusABoolean = true;
+
 
         public SynAllUser(Context context, GoogleMap googleMap) {
             this.context = context;
@@ -139,9 +158,30 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
                     latDoubles[i] = Double.parseDouble(jsonObject.getString("Lat"));
                     lngDoubles[i] = Double.parseDouble(jsonObject.getString("Lng"));
                     //Create Marker
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latDoubles[i],lngDoubles[i])));
+                    MyConstant myConstant = new MyConstant();
+                    int[] iconInts = myConstant.getAvataInts();
+
+
+                   googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latDoubles[i],lngDoubles[i]))
+                            .icon(BitmapDescriptorFactory.fromResource(iconInts[avataInts[i]]))
+                            .title(nameStrings[i]+""+surStrings[i]));
+
+                    Log.d("2SepV3", "Name ("+i+")=" + nameStrings[i]);
+                    Log.d("2SepV3", "Lat ("+i+")=" + latDoubles[i]);
+                    Log.d("2SepV3", "Lng ("+i+")=" + lngDoubles[i]);
+                    Log.d("2SepV3", "==============================");
                 }//for
+
+                googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(LatLng latLng) {
+                        statusABoolean = !statusABoolean;
+                        Log.d("2SepV4", "Status===>" + statusABoolean);
+                    }
+                });
+
+
 
             } catch (Exception e) {
                 Log.d("2SepV3", "e onPost ==>" + e.toString());
@@ -190,7 +230,7 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
             Log.d("1SepV1", "Cannot find Location");
         }
 
-
+       // Log.d("2SepV", "Cannot find Location"+location);
         return location;
     }
 
@@ -223,24 +263,21 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Setup Center of Map
         LatLng latLng = new LatLng(userLatAdouble, userLngADouble);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,16));
-
         //Loop
         myLoop();
-
-
     }
 
     private void myLoop() {
         //To do สิ่งที่ต้องทำ
         Log.d("1SepV2", "Lat==>" + userLatAdouble);
         Log.d("1SepV2", "Lng==>" + userLngADouble);
-
         editLatLngOnServer();
-        createMarker();
+        if (statusABoolean) {
+            createMarker();
+        }
 
 
         //Post Delay
