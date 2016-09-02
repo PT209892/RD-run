@@ -5,6 +5,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -27,6 +28,9 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import static com.example.user.rdrun.R.id.textView7;
@@ -45,6 +49,7 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private LocationManager locationManager;//เปิดในการค้นหาพิกัดที่อยู่บนโลก location แผนที่ คือ ละติจูด ลองติดจูด
     private Criteria criteria;
     private static final String urlPHP="http://swiftcodingthai.com/rd/edit_location_pattama.php";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +89,70 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }//Main Method
+
+    private class SynAllUser extends AsyncTask<Void, Void, String> {
+        //Explicit
+        private Context context;
+        private GoogleMap googleMap;
+        private static final String urlJSON="http://swiftcodingthai.com/rd/get_user_master.php";
+        private String[] nameStrings, surStrings;
+        private int[] avataInts;
+        private double[] latDoubles, lngDoubles;
+
+        public SynAllUser(Context context, GoogleMap googleMap) {
+            this.context = context;
+            this.googleMap = googleMap;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            try {
+                OkHttpClient okHttpClient = new OkHttpClient();
+                Request.Builder builder = new Request.Builder();
+                Request request = builder.url(urlJSON).build();
+                Response response = okHttpClient.newCall(request).execute();
+                return response.body().string();
+
+            } catch (Exception e) {
+                Log.d("2SepV2", "e doIn==>" + e.toString());
+                return null;
+            }
+
+        }//doInBack
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("2SepV2", "JSON ==>" +s);
+            try {
+                JSONArray jsonArray = new JSONArray(s);
+                nameStrings = new String[jsonArray.length()];
+                surStrings = new String[jsonArray.length()];
+                avataInts = new int[jsonArray.length()];
+                latDoubles = new double[jsonArray.length()];
+                lngDoubles = new double[jsonArray.length()];
+                for(int i=0;i<jsonArray.length();i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    nameStrings[i] = jsonObject.getString("Name");
+                    surStrings[i] = jsonObject.getString("Surname");
+                    avataInts[i] = Integer.parseInt(jsonObject.getString("Avata"));
+                    latDoubles[i] = Double.parseDouble(jsonObject.getString("Lat"));
+                    lngDoubles[i] = Double.parseDouble(jsonObject.getString("Lng"));
+                    //Create Marker
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latDoubles[i],lngDoubles[i])));
+                }//for
+
+            } catch (Exception e) {
+                Log.d("2SepV3", "e onPost ==>" + e.toString());
+            }
+
+      }
+    }//SynAllUser Class
+
+
+
 
     @Override
     //เช็คครั้งแรกจะได้ Network provider ก่อน แล้วจะได้ gps
@@ -172,6 +241,8 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         Log.d("1SepV2", "Lng==>" + userLngADouble);
 
         editLatLngOnServer();
+        createMarker();
+
 
         //Post Delay
         Handler handler = new Handler();
@@ -183,6 +254,14 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         },1000);
 
     }   //myLoop
+
+    private void createMarker() {
+        //Clear Marker
+        mMap.clear();
+
+        SynAllUser synAllUser = new SynAllUser(this,mMap);
+        synAllUser.execute();
+    }//createMarker
 
     private void editLatLngOnServer() {
         OkHttpClient okHttpClient = new OkHttpClient();
